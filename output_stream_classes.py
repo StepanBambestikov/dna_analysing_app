@@ -23,7 +23,7 @@ class file_output_stream(output_stream):
             self.error_manager("Problems with saving data into save file, please check save file validity")
 
 
-class function_output_stream:
+class function_output_stream(output_stream):
     def __init__(self, output_function=None, error_manager=None):
         self.output_function = output_function
         self.error_manager = error_manager
