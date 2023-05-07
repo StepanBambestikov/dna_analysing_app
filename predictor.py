@@ -20,8 +20,8 @@ class Processing(IntEnum):
 
 dna_handlers = {
     Processing.D1: dna_handlers.make_1d_data_from_text_dna,
-    Processing.D2: dna_handlers.make_2d_data_from_text_dna,
-    Processing.NN: dna_handlers.make_nn_data_from_text_dna,
+    Processing.D2: dna_handlers.Na_data_function_maker(dna_handlers.make_2d_data_from_text_dna),
+    Processing.NN: dna_handlers.Na_data_function_maker(dna_handlers.make_nn_data_from_text_dna)
 }
 
 
@@ -39,30 +39,32 @@ def make_test_network():
     return test_network
 
 
-model_types_to_saved_files = {
-    nn_classes.multi_nn_2layer_net: "multi_nn_2layer_net"
-
+model_names_to_saved_files = {
+    "conv_rel": "conv2d_net_06_05normalized_l1_multi_loss_relative_Tm",
+    "conv_abs": "conv2d_net_06_05normalized_l1_multi_loss_absolute_Tm",
+    "linear_rel": "linear_net_06_05normalized_l1_multi_loss_06_05_relative_loss"
 }
 
+
 # todo delete test_mode
-def _load_network(model_type, test_mode=False):
+def _load_network(model_name, model_type):
     model = model_type()
-    if not test_mode:
-        saved_model_file_name = model_types_to_saved_files[model_type]
-        model.load_state_dict(torch.load(saved_model_file_name))
+    saved_model_file_name = model_names_to_saved_files[model_name]
+    model.load_state_dict(torch.load(saved_model_file_name))
     return model
 
 
 class Predictor:
-    def __init__(self, model_type, conv_factor, dna_process_manager):
+    def __init__(self, model_name, model_type, conv_factor, dna_process_manager):
+        self.model_name = model_name
         self.model_type = model_type
         self.conv_factor = conv_factor
         self.dna_process_manager = dna_process_manager
 
     def __call__(self, input_data):
-        model = _load_network(self.model_type, test_mode=True)
-        processed_dna = self.dna_process_manager(input_data[:, 0])
-        predictions = model(processed_dna, input_data[:, 1:])
+        model = _load_network(self.model_name, self.model_type)
+        processed_dna = self.dna_process_manager(input_data[:, :2])
+        predictions = model([*processed_dna])
         Tm_prediction = _Tm_calculation(predictions[:, prediction_columns.dH_INDEX],
                                                   predictions[:, prediction_columns.dS_INDEX])
         return torch.cat((predictions, Tm_prediction[:, None]), dim=1)

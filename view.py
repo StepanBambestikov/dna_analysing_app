@@ -7,8 +7,9 @@ import controller
 import pandasModel
 
 predictor_text_to_enum = {
-    "linear_processing": Predictor_types.LINEAR_PREDICTOR,
-    "test_processing": Predictor_types.TEST_PREDICTOR,
+    "linear_rel_processing": Predictor_types.LINEAR_REL_PREDICTOR,
+    "conv_abs_processing": Predictor_types.CONV_ABS_PREDICTOR,
+    "conv_rel_processing": Predictor_types.CONV_REL_PREDICTOR
 }
 
 text_file_type_to_enum = {
@@ -89,9 +90,10 @@ class view_window(QMainWindow, Ui_MainWindow):
 
     def _get_writed_data(self):
         dna = self.ui.dnaSequenceLineEdit.text()
-        s1 = self.ui.s1LineEdit.text()
-        s2 = self.ui.s2LineEdit.text()
-        Ct = self.ui.CtLineEdit.text()
+        #todo change buttons in right order!
+        Ct = self.ui.s1LineEdit.text()
+        s1 = self.ui.s2LineEdit.text()
+        s2 = self.ui.CtLineEdit.text()
         if not dna or not s1 or not s2 or not Ct:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "Entered data isn't complete. Some of the fields (dna, s1, s2, Ct) are empty")

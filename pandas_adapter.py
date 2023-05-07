@@ -17,6 +17,6 @@ pandas_writers = {
 
 
 def _make_output_DataFrame(predictions_tensor, input_data_numpy, column_names):
-    output_data = np.concatenate((input_data_numpy, predictions_tensor.numpy()), axis=1)
+    output_data = np.concatenate((input_data_numpy, predictions_tensor.detach().numpy()), axis=1)
     output_dataFrame = pandas.DataFrame(data=output_data, columns=column_names)
     return output_dataFrame
