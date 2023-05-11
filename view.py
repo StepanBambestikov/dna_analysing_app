@@ -91,21 +91,17 @@ class view_window(QMainWindow, Ui_MainWindow):
     def _get_writed_data(self):
         dna = self.ui.dnaSequenceLineEdit.text()
         #todo change buttons in right order!
-        Ct = self.ui.s1LineEdit.text()
-        s1 = self.ui.s2LineEdit.text()
-        s2 = self.ui.CtLineEdit.text()
-        if not dna or not s1 or not s2 or not Ct:
+        Ct = self.ui.CtLineEdit.text()
+        if not dna or not Ct:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "Entered data isn't complete. Some of the fields (dna, s1, s2, Ct) are empty")
-        return dna, Ct, s1, s2
+        return dna, Ct
 
     def _collect_information(self):
         user_information = {ve.INPUT_INFO.PREDICTOR_TYPE: self._get_predictor_type()}
         if self.visibility_current_states[self.ui.writeDataInnerFrame]:
-            dna, Ct, s1, s2 = self._get_writed_data()
+            dna, Ct = self._get_writed_data()
             user_information[ve.INPUT_INFO.DNA_DATA] = dna
-            user_information[ve.INPUT_INFO.S1] = s1
-            user_information[ve.INPUT_INFO.S2] = s2
             user_information[ve.INPUT_INFO.Ct] = Ct
         elif self.visibility_current_states[self.ui.inputFileInnerFrame]:
             input_file_name, input_file_type = self._get_input_file()

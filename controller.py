@@ -15,10 +15,8 @@ def _load_data_from_file(input_file_name, input_file_type):
 
 def _get_entered_data(enum_input_data):
     dna = np.array([enum_input_data[INPUT_INFO.DNA_DATA]])
-    s1 = np.array([enum_input_data[INPUT_INFO.S1]])
-    s2 = np.array([enum_input_data[INPUT_INFO.S2]])
     Ct = np.array([enum_input_data[INPUT_INFO.Ct]])
-    data = np.concatenate((dna, s1, s2, Ct))
+    data = np.concatenate((dna, Ct))
     return np.expand_dims(data, axis=0)
 
 
