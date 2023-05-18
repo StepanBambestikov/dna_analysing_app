@@ -78,7 +78,7 @@ length_pows = [2, 3]
 dna_column = 0
 
 
-def Na_data_function_maker(origin_preparator):
+def Na_data_function_maker(origin_preparator, prepare_salt=False):
     def function(dna_and_na_array):
         origin_data = torch.from_numpy(origin_preparator(dna_and_na_array[:, 0]))
         gc_concetrations = _get_gc_concentration(dna_and_na_array[:, 0])
@@ -86,17 +86,21 @@ def Na_data_function_maker(origin_preparator):
         gc_concetrations = _array_pow_expantion(gc_concetrations, gc_pows)
         sequences_lengths = _array_pow_expantion(sequences_lengths, length_pows)
         Na_features = torch.from_numpy(dna_and_na_array[:, 1].astype(np.float64))[:, None]
+        if prepare_salt:
+            Na_features = Na_features * 10 ** (-0.509 * (Na_features) ** 0.5 / (1 + (Na_features) ** 0.5) - 0.2 * (Na_features))
         return origin_data, torch.cat((gc_concetrations, sequences_lengths, Na_features), dim=1)
     return function
 
 
-def make_Na_data_from_text_dna(dna_and_na_array, origin_preparator):
+def make_Na_data_from_text_dna(dna_and_na_array, origin_preparator, prepare_salt=False):
     origin_data = torch.from_numpy(origin_preparator(dna_and_na_array[:, 0]))
     gc_concetrations = _get_gc_concentration(dna_and_na_array[:, 0])
     sequences_lengths = _get_sequences_lengths(dna_and_na_array[:, 0])
     gc_concetrations = _array_pow_expantion(gc_concetrations, gc_pows)
     sequences_lengths = _array_pow_expantion(sequences_lengths, length_pows)
     Na_features = torch.from_numpy(dna_and_na_array[:, 1].astype(np.float64))[:, None]
+    if prepare_salt:
+        Na_features = Na_features * 10 ^ (-0.509 * (Na_features) ** 0.5 / (1 + (Na_features) ** 0.5) - 0.2 * (Na_features))
     return origin_data, torch.cat((gc_concetrations, sequences_lengths, Na_features), dim=1)
 
 

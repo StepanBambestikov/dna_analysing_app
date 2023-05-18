@@ -9,6 +9,8 @@ class INPUT_INFO(IntEnum):
     INPUT_FILE_TYPE = 4
     OUTPUT_FILE_NAME = 5
     OUTPUT_FILE_TYPE = 6
+    Ct_IS_ACTIVITY = 7
+    Ct_IS_SALT = 8
 
 
 class VIEW_MANAGERS(IntEnum):

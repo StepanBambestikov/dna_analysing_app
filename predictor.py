@@ -3,6 +3,7 @@ import torch
 import math
 import dna_handlers
 import network_classes as nn_classes
+import view_enum
 
 tm_additive = 1.987 * math.log(1e-5 / 4)
 
@@ -18,13 +19,6 @@ class Processing(IntEnum):
     D2 = 2
 
 
-dna_handlers = {
-    Processing.D1: dna_handlers.make_1d_data_from_text_dna,
-    Processing.D2: dna_handlers.Na_data_function_maker(dna_handlers.make_2d_data_from_text_dna),
-    Processing.NN: dna_handlers.Na_data_function_maker(dna_handlers.make_nn_data_from_text_dna)
-}
-
-
 class prediction_columns(IntEnum):
     dH_INDEX = 0
     dG_INDEX = 1
@@ -32,12 +26,19 @@ class prediction_columns(IntEnum):
     Tm_INDEX = 3
 
 
-def make_test_network():
-    def test_network(processed_dna, sol_data):
-        prediction = torch.ones([processed_dna.shape[0], 3])
-        return prediction
-    return test_network
-
+dna_handlers = {
+    Processing.D1: dna_handlers.make_1d_data_from_text_dna,
+    Processing.D2: {view_enum.INPUT_INFO.Ct_IS_ACTIVITY: dna_handlers.Na_data_function_maker(
+        dna_handlers.make_2d_data_from_text_dna, prepare_salt=False),
+                    view_enum.INPUT_INFO.Ct_IS_SALT: dna_handlers.Na_data_function_maker(
+                        dna_handlers.make_2d_data_from_text_dna,
+                        prepare_salt=True)},
+    Processing.NN: {view_enum.INPUT_INFO.Ct_IS_ACTIVITY: dna_handlers.Na_data_function_maker(
+        dna_handlers.make_nn_data_from_text_dna, prepare_salt=False),
+                    view_enum.INPUT_INFO.Ct_IS_SALT: dna_handlers.Na_data_function_maker(
+                        dna_handlers.make_nn_data_from_text_dna,
+                        prepare_salt=True)}
+}
 
 model_names_to_saved_files = {
     "conv_rel": "conv2d_net_06_05normalized_l1_multi_loss_relative_Tm",
@@ -46,7 +47,6 @@ model_names_to_saved_files = {
 }
 
 
-# todo delete test_mode
 def _load_network(model_name, model_type):
     model = model_type()
     saved_model_file_name = model_names_to_saved_files[model_name]
@@ -55,16 +55,15 @@ def _load_network(model_name, model_type):
 
 
 class Predictor:
-    def __init__(self, model_name, model_type, conv_factor, dna_process_manager):
+    def __init__(self, model_name, model_type, conv_factor):
         self.model_name = model_name
         self.model_type = model_type
         self.conv_factor = conv_factor
-        self.dna_process_manager = dna_process_manager
 
-    def __call__(self, input_data):
+    def __call__(self, input_data, dna_process_manager):
         model = _load_network(self.model_name, self.model_type)
-        processed_dna = self.dna_process_manager(input_data[:, :2])
+        processed_dna = dna_process_manager(input_data[:, :2])
         predictions = model([*processed_dna])
         Tm_prediction = _Tm_calculation(predictions[:, prediction_columns.dH_INDEX],
-                                                  predictions[:, prediction_columns.dS_INDEX])
+                                        predictions[:, prediction_columns.dS_INDEX])
         return torch.cat((predictions, Tm_prediction[:, None]), dim=1)

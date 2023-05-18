@@ -16,7 +16,7 @@ output_column_names = {
     DataColumns.dH: "dH",
     DataColumns.dG: "dG",
     DataColumns.dS: "dS",
-    DataColumns.Tm: "Tm",
+    DataColumns.Tm: "Tm"
 }
 
 output_column_str_name_list = [output_column_names[DataColumns.DNA], output_column_names[DataColumns.Ct],

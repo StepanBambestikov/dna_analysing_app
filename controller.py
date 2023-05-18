@@ -1,15 +1,18 @@
+import predictor_adapter
 from view_enum import *
 import pandas_adapter as pd
 import predictor_adapter as pa
 import numpy as np
 import output_table_columns
 import output_stream_classes
+import predictor
 
 
 def _load_data_from_file(input_file_name, input_file_type):
     read_function = pd.pandas_readers[input_file_type]
-    data = read_function(input_file_name, header=None)
-    first_row_index = 1
+
+    data = read_function(input_file_name)
+    first_row_index = 0
     return data.to_numpy()[first_row_index:, :]
 
 
@@ -17,12 +20,22 @@ def _get_entered_data(enum_input_data):
     dna = np.array([enum_input_data[INPUT_INFO.DNA_DATA]])
     Ct = np.array([enum_input_data[INPUT_INFO.Ct]])
     data = np.concatenate((dna, Ct))
-    return np.expand_dims(data, axis=0)
+    if enum_input_data[INPUT_INFO.Ct_IS_ACTIVITY]:
+        Ct_factor = INPUT_INFO.Ct_IS_ACTIVITY
+    else:
+        Ct_factor = INPUT_INFO.Ct_IS_SALT
+    return np.expand_dims(data, axis=0), Ct_factor
 
 
 def _get_predictor(enum_input_data):
     enum_predictor_type = enum_input_data[INPUT_INFO.PREDICTOR_TYPE]
     return pa.predictor_to_object[enum_predictor_type]
+
+
+def _get_data_manager(enum_input_data, Ct_factor):
+    dna_analysis_type = predictor_adapter.predictor_to_dna_analisys_type[enum_input_data[INPUT_INFO.PREDICTOR_TYPE]]
+    data_manager = predictor.dna_handlers[dna_analysis_type][Ct_factor]
+    return data_manager
 
 
 class controller:
@@ -36,14 +49,15 @@ class controller:
         :param enum_input_data: information from view
         :param view_managers: output methods provided by view
         """
-        data = self._load_data_for_predictor(enum_input_data)
-        predictor = _get_predictor(enum_input_data)
+        data, Ct_factor = self._load_data_for_predictor(enum_input_data)
+        data_manager = _get_data_manager(enum_input_data, Ct_factor)
+        predictor_ = _get_predictor(enum_input_data)
         output_streams = self._make_output_streams(enum_input_data)
-        self._calculate_and_pass_predictions(predictor, data, output_streams)
+        self._calculate_and_pass_predictions(predictor_, data, output_streams, data_manager)
 
-    def _calculate_and_pass_predictions(self, predictor, input_data, output_streams):
+    def _calculate_and_pass_predictions(self, predictor, input_data, output_streams, data_manager):
         try:
-            predictions = predictor(input_data)
+            predictions = predictor(input_data, data_manager)
         except Exception:
             self.error_manager("There is invalid data for analysis. Please, check all the data "
                                                        "validity")
@@ -68,10 +82,10 @@ class controller:
         if INPUT_INFO.INPUT_FILE_NAME in enum_input_data.keys():
             input_file_name = enum_input_data[INPUT_INFO.INPUT_FILE_NAME]
             input_file_type = enum_input_data[INPUT_INFO.INPUT_FILE_TYPE]
-            if not input_file_name or not input_file_type:
-                self.error_manager("Invalid data about input file!")
+            # if not input_file_name or not input_file_type:
+            #     self.error_manager("Invalid data about input file!")
             try:
-                return _load_data_from_file(input_file_name, input_file_type)
+                return _load_data_from_file(input_file_name, input_file_type), INPUT_INFO.Ct_IS_ACTIVITY
             except Exception:
                 self.error_manager("Invalid input file")
 

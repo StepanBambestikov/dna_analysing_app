@@ -4,9 +4,21 @@ from file_types import File_types
 import numpy as np
 
 
+def make_csv_reader():
+    def csv_reader(input_file_name):
+        return pd.read_csv(input_file_name, header=None, sep=";")
+    return csv_reader
+
+
+def make_excel_reader():
+    def csv_reader(input_file_name):
+        return pd.read_excel(input_file_name)
+    return csv_reader
+
+
 pandas_readers = {
-    File_types.CSV: pd.read_csv,
-    File_types.EXCEL: pd.read_excel
+    File_types.CSV: make_csv_reader(),
+    File_types.EXCEL: make_excel_reader()
 }
 
 
