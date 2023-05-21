@@ -76,9 +76,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>131</y>
+      <y>128</y>
       <width>486</width>
-      <height>171</height>
+      <height>201</height>
      </rect>
     </property>
     <widget class="QCheckBox" name="inputFileCheckBox">
@@ -105,7 +105,7 @@
        <x>11</x>
        <y>58</y>
        <width>484</width>
-       <height>113</height>
+       <height>161</height>
       </rect>
      </property>
      <property name="minimumSize">
@@ -172,6 +172,20 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="fileSaltConditionLabel">
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>condition type: Activity</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </widget>
@@ -179,7 +193,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>560</y>
+      <y>584</y>
       <width>486</width>
       <height>162</height>
      </rect>
@@ -281,8 +295,8 @@
    <widget class="QPushButton" name="calculateButton">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>730</y>
+      <x>355</x>
+      <y>753</y>
       <width>140</width>
       <height>45</height>
      </rect>
@@ -300,7 +314,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>300</y>
+      <y>331</y>
       <width>506</width>
       <height>260</height>
      </rect>
@@ -329,7 +343,7 @@
        <x>11</x>
        <y>58</y>
        <width>484</width>
-       <height>191</height>
+       <height>201</height>
       </rect>
      </property>
      <property name="minimumSize">
@@ -361,19 +375,19 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="CtLabel">
+       <widget class="QLabel" name="ValueLabel">
         <property name="font">
          <font>
           <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Ct</string>
+         <string>Value</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="CtLineEdit">
+       <widget class="QLineEdit" name="ValueLineEdit">
         <property name="font">
          <font>
           <pointsize>18</pointsize>
@@ -385,14 +399,14 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QRadioButton" name="CtIsActivityRadioButton">
+       <widget class="QRadioButton" name="IsActivityRadioButton">
         <property name="font">
          <font>
           <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Ct is activity</string>
+         <string>Activity</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -400,14 +414,38 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QRadioButton" name="CtIsSaltRadioButton">
+       <widget class="QRadioButton" name="IsSaltRadioButton">
         <property name="font">
          <font>
           <pointsize>18</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>Ct is salt</string>
+         <string>Salt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="CtLineEdit">
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>0.00001</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="CtLabel">
+        <property name="font">
+         <font>
+          <pointsize>18</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Ct</string>
         </property>
        </widget>
       </item>

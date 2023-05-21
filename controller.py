@@ -18,13 +18,14 @@ def _load_data_from_file(input_file_name, input_file_type):
 
 def _get_entered_data(enum_input_data):
     dna = np.array([enum_input_data[INPUT_INFO.DNA_DATA]])
-    Ct = np.array([enum_input_data[INPUT_INFO.Ct]])
-    data = np.concatenate((dna, Ct))
-    if enum_input_data[INPUT_INFO.Ct_IS_ACTIVITY]:
-        Ct_factor = INPUT_INFO.Ct_IS_ACTIVITY
+    Ct = enum_input_data[INPUT_INFO.Ct]
+    salt_factor_value = np.array([enum_input_data[INPUT_INFO.SALT_VALUE]])
+    data = np.concatenate((dna, salt_factor_value))
+    if enum_input_data[INPUT_INFO.IS_ACTIVITY]:
+        salt_factor_type = INPUT_INFO.IS_ACTIVITY
     else:
-        Ct_factor = INPUT_INFO.Ct_IS_SALT
-    return np.expand_dims(data, axis=0), Ct_factor
+        salt_factor_type = INPUT_INFO.IS_SALT
+    return np.expand_dims(data, axis=0), Ct, salt_factor_type
 
 
 def _get_predictor(enum_input_data):
@@ -49,15 +50,15 @@ class controller:
         :param enum_input_data: information from view
         :param view_managers: output methods provided by view
         """
-        data, Ct_factor = self._load_data_for_predictor(enum_input_data)
-        data_manager = _get_data_manager(enum_input_data, Ct_factor)
+        data, Ct, salt_factor_type = self._load_data_for_predictor(enum_input_data)
+        data_manager = _get_data_manager(enum_input_data, salt_factor_type)
         predictor_ = _get_predictor(enum_input_data)
         output_streams = self._make_output_streams(enum_input_data)
-        self._calculate_and_pass_predictions(predictor_, data, output_streams, data_manager)
+        self._calculate_and_pass_predictions(predictor_, data, output_streams, data_manager, Ct)
 
-    def _calculate_and_pass_predictions(self, predictor, input_data, output_streams, data_manager):
+    def _calculate_and_pass_predictions(self, predictor, input_data, output_streams, data_manager, Ct):
         try:
-            predictions = predictor(input_data, data_manager)
+            predictions = predictor(input_data, data_manager, Ct)
         except Exception:
             self.error_manager("There is invalid data for analysis. Please, check all the data "
                                                        "validity")
@@ -85,7 +86,7 @@ class controller:
             # if not input_file_name or not input_file_type:
             #     self.error_manager("Invalid data about input file!")
             try:
-                return _load_data_from_file(input_file_name, input_file_type), INPUT_INFO.Ct_IS_ACTIVITY
+                return _load_data_from_file(input_file_name, input_file_type), 1e-5, INPUT_INFO.IS_ACTIVITY
             except Exception:
                 self.error_manager("Invalid input file")
 
