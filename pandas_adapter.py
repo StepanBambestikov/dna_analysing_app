@@ -11,9 +11,9 @@ def make_csv_reader():
 
 
 def make_excel_reader():
-    def csv_reader(input_file_name):
-        return pd.read_excel(input_file_name)
-    return csv_reader
+    def excel_reader(input_file_name):
+        return pd.read_excel(input_file_name, engine='openpyxl')
+    return excel_reader
 
 
 pandas_readers = {
@@ -21,11 +21,35 @@ pandas_readers = {
     File_types.EXCEL: make_excel_reader()
 }
 
+def make_csv_writer():
+    def csv_writer(saving_dataframe, input_file_name):
+        return pd.DataFrame.to_csv(saving_dataframe, input_file_name, sep=";")
+    return csv_writer
+
+
+def make_excel_writer():
+    def excel_writer(saving_dataframe, input_file_name):
+        return pd.DataFrame.to_excel(saving_dataframe, input_file_name, engine='openpyxl')
+    return excel_writer
 
 pandas_writers = {
-    File_types.CSV: pd.DataFrame.to_csv,
-    File_types.EXCEL: pd.DataFrame.to_excel,
+    File_types.CSV: make_csv_writer(),
+    File_types.EXCEL: make_excel_writer(),
 }
+
+pandas_file_extensions = {
+    "csv": File_types.CSV,
+    "xlsx": File_types.EXCEL,
+}
+
+
+def get_file_extension_by_name(file_name):
+    splitted_name = file_name.partition(".")
+    if len(splitted_name) != 3:
+        return None
+    if file_name.partition(".")[2] not in pandas_file_extensions:
+        return None
+    return pandas_file_extensions[file_name.partition(".")[2]]
 
 
 def _make_output_DataFrame(predictions_tensor, input_data_numpy, column_names):
