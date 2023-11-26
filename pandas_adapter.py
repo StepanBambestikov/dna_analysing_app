@@ -52,7 +52,8 @@ def get_file_extension_by_name(file_name):
     return pandas_file_extensions[file_name.partition(".")[2]]
 
 
-def _make_output_DataFrame(predictions_tensor, input_data_numpy, column_names):
-    output_data = np.concatenate((input_data_numpy, predictions_tensor.detach().numpy()), axis=1)
+def _make_output_DataFrame(predictions_tensor, input_data_numpy, column_names, column_options, decimals):
+    output_data = np.concatenate((input_data_numpy, np.round(predictions_tensor.detach().numpy(), decimals=decimals)), axis=1)
+    output_data = np.concatenate((np.array(column_options), output_data), axis=0)
     output_dataFrame = pandas.DataFrame(data=output_data, columns=column_names)
     return output_dataFrame

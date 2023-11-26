@@ -128,9 +128,12 @@ def make_2d_data_from_text_dna(text_dna_array):
     summary_padding = 0
 
     data_features = np.zeros((text_dna_array.shape[0], dna_bases_count + summary_padding, max_string_size))
-    for data_row_index, current_str in enumerate(text_dna_array):
-        for data_col_index, current_symbol in enumerate(current_str):
-            data_features[data_row_index, dna_binary_view[current_symbol] + first_axis_padding,
-                                          data_col_index + second_axis_padding] = 1
+    try:
+        for data_row_index, current_str in enumerate(text_dna_array):
+            for data_col_index, current_symbol in enumerate(current_str):
+                data_features[data_row_index, dna_binary_view[current_symbol] + first_axis_padding,
+                                            data_col_index + second_axis_padding] = 1
+    except KeyError:
+        raise ValueError("Unexpected letter in dna sequence")
     return data_features.astype('float32')
 

@@ -9,6 +9,7 @@ import output_table_columns
 import output_stream_classes
 import pandas_adapter as pd
 from PyQt5.QtCore import QTimer
+from output_table_columns import DataColumns, output_column_names
 
 predictor_text_to_enum = {
     "linear_rel_processing": Predictor_types.LINEAR_REL_PREDICTOR,
@@ -106,28 +107,28 @@ class view_window(QMainWindow, Ui_MainWindow):
     def _get_writed_data(self):
         dna = self.ui.dnaSequenceLineEdit.text()
         #todo change buttons in right order!
-        salt_value = float(self.ui.ValueLineEdit.text())
+        salt_value = float(self.ui.NaLineEdit.text())
         Ct = float(self.ui.CtLineEdit.text())
-        is_activity = self.ui.IsActivityRadioButton.isChecked()
-        is_salt = self.ui.IsSaltRadioButton.isChecked()
+        # is_activity = self.ui.IsActivityRadioButton.isChecked()
+        # is_salt = self.ui.IsSaltRadioButton.isChecked()
         if not dna or not salt_value:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "Entered data isn't complete. Some of the fields (dna, salt_value) are empty")
-        return dna, salt_value, Ct, is_activity, is_salt
+        return dna, salt_value, Ct
 
     def _collect_information(self):
         user_information = {ve.INPUT_INFO.PREDICTOR_TYPE: self._get_predictor_type()}
         if not self.ui.writeDataInnerFrame.isHidden():
             try:
-                dna, salt_value, Ct, is_activity, is_salt = self._get_writed_data()
+                dna, salt_value, Ct = self._get_writed_data()
             except Exception:
                 self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                     "Invalid written data")
             user_information[ve.INPUT_INFO.DNA_DATA] = dna
             user_information[ve.INPUT_INFO.Ct] = Ct
             user_information[ve.INPUT_INFO.SALT_VALUE] = salt_value
-            user_information[ve.INPUT_INFO.IS_ACTIVITY] = is_activity
-            user_information[ve.INPUT_INFO.IS_SALT] = is_salt
+            user_information[ve.INPUT_INFO.IS_ACTIVITY] = False
+            user_information[ve.INPUT_INFO.IS_SALT] = True
         elif not self.ui.inputFileInnerFrame.isHidden():
             input_file_name, input_file_type = self._get_input_file()
             user_information[ve.INPUT_INFO.INPUT_FILE_NAME] = input_file_name
@@ -167,9 +168,20 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Invalid input file type, you can use only excel and csv files!")
         read_function = pd.pandas_readers[file_ext]
         data = read_function(file_name)
-        if data.shape[1] != 2:
+        if data.shape[1] == 0:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "Invalid input file, there must be columns dna and Ct!")
+                "Invalid input file, there is no columns")
+        elif data.shape[1] == 1:
+            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
+                                                                       "There is no Ct in file or in default text item!")
+            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit, "There is no Na in file or in default text item!")
+            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])], allow_duplicates=True)
+            data.insert(1, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])], allow_duplicates=True)
+        elif data.shape[1] == 2:
+            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
+                                                                       "There is no Ct in file or in default text item!")
+            data.insert(1, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])], allow_duplicates=True)
+
         output_streams = self.controller._make_output_streams()
         output_streams[0] << data
         self.controller.predictions = None
@@ -181,6 +193,12 @@ class view_window(QMainWindow, Ui_MainWindow):
         self.ui.writeDataInnerFrame.hide()
         self.ui.appendDataButton.show()
 
+    def get_valid_float_parameter_from_line_edit(self, line_edit, error_message):
+        try:
+            valid_parameter = float(line_edit.text())
+        except Exception:
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](error_message)
+        return valid_parameter
 
     def browse_save_file(self):
         folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
@@ -221,7 +239,7 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("no save directory!")
         save_file_name = save_directory + "/" + save_file_name
         predictions = pd._make_output_DataFrame(self.controller.predictions, self.controller.input_data,
-                                                output_table_columns.output_column_str_name_list)
+                                                output_table_columns.output_column_str_name_list, decimals=5)
         output_stream = output_stream_classes.file_output_stream(save_file_name=save_file_name,
                                                                  save_file_type=save_file_type,
                                                                  error_manager=self.controller.error_manager)

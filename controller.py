@@ -22,7 +22,7 @@ def _get_entered_data(enum_input_data):
     dna = np.array([enum_input_data[INPUT_INFO.DNA_DATA]])
     Ct = enum_input_data[INPUT_INFO.Ct]
     salt_factor_value = np.array([enum_input_data[INPUT_INFO.SALT_VALUE]])
-    data = np.concatenate((dna, salt_factor_value))
+    data = np.concatenate((dna, salt_factor_value, np.array([Ct])))
     if enum_input_data[INPUT_INFO.IS_ACTIVITY]:
         salt_factor_type = INPUT_INFO.IS_ACTIVITY
     else:
@@ -75,7 +75,7 @@ class controller:
             self.input_data = np.concatenate((self.input_data, input_data), axis=0)
 
         predictions = pd._make_output_DataFrame(self.predictions, self.input_data,
-                                                output_table_columns.output_column_str_name_list)
+                                                output_table_columns.output_column_str_name_list, output_table_columns.output_column_str_options_list, decimals=2)
 
         for current_output_stream in output_streams:
             current_output_stream << predictions
