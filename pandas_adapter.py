@@ -16,6 +16,7 @@ def make_excel_reader():
         return pd.read_excel(input_file_name, engine='openpyxl')
     return excel_reader
 
+
 def make_fasta_reader():
     def fasta_reader(input_file_name):
         sequences = []
