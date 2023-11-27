@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>946</width>
+    <width>1381</width>
     <height>901</height>
    </rect>
   </property>
@@ -14,7 +14,7 @@
    <string>Calculator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableView" name="tableView">
+   <widget class="TableView" name="tableView">
     <property name="geometry">
      <rect>
       <x>520</x>
@@ -367,7 +367,7 @@
          </font>
         </property>
         <property name="text">
-         <string>0.00001</string>
+         <string>1e-5</string>
         </property>
        </widget>
       </item>
@@ -483,13 +483,20 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>946</width>
+     <width>1381</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TableView</class>
+   <extends>QTableView</extends>
+   <header>TableView</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

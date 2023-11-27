@@ -171,16 +171,16 @@ class view_window(QMainWindow, Ui_MainWindow):
         if data.shape[1] == 0:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "Invalid input file, there is no columns")
-        elif data.shape[1] == 1:
+
+        if "Na" not in data and "[Na⁺]" not in data:
+            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
+                                                                       "There is no Na in file or in default text item!")
+            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
+
+        if "Ct" not in data:
             default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
                                                                        "There is no Ct in file or in default text item!")
-            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit, "There is no Na in file or in default text item!")
-            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])], allow_duplicates=True)
-            data.insert(1, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])], allow_duplicates=True)
-        elif data.shape[1] == 2:
-            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
-                                                                       "There is no Ct in file or in default text item!")
-            data.insert(1, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])], allow_duplicates=True)
+            data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
 
         output_streams = self.controller._make_output_streams()
         output_streams[0] << data
@@ -202,9 +202,6 @@ class view_window(QMainWindow, Ui_MainWindow):
 
     def browse_save_file(self):
         folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        # if len(fname) == 0:
-        #     return
-        # folder_path = folder_path[0]
         splitted_name = folder_path.partition(".")
         if len(splitted_name) > 3:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
@@ -239,7 +236,7 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("no save directory!")
         save_file_name = save_directory + "/" + save_file_name
         predictions = pd._make_output_DataFrame(self.controller.predictions, self.controller.input_data,
-                                                output_table_columns.output_column_str_name_list, decimals=5)
+                                                output_table_columns.output_column_str_name_list, decimals=5, column_options=output_table_columns.output_column_str_options_list)
         output_stream = output_stream_classes.file_output_stream(save_file_name=save_file_name,
                                                                  save_file_type=save_file_type,
                                                                  error_manager=self.controller.error_manager)

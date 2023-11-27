@@ -14,10 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(946, 901)
+        MainWindow.resize(1381, 901)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.tableView = QtWidgets.QTableView(self.centralwidget)
+        self.tableView = TableView(self.centralwidget)
         self.tableView.setGeometry(QtCore.QRect(520, 30, 751, 731))
         self.tableView.setObjectName("tableView")
         self.processingTypeFrame = QtWidgets.QFrame(self.centralwidget)
@@ -207,7 +207,7 @@ class Ui_MainWindow(object):
         self.splitter.setObjectName("splitter")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 946, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1381, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -236,12 +236,13 @@ class Ui_MainWindow(object):
         self.NaLabel.setText(_translate("MainWindow", "[Na+], M"))
         self.NaLineEdit.setText(_translate("MainWindow", "1"))
         self.CtLabel.setText(_translate("MainWindow", "Ct, M"))
-        self.CtLineEdit.setText(_translate("MainWindow", "0.00001"))
+        self.CtLineEdit.setText(_translate("MainWindow", "1e-5"))
         self.writeDataLabel.setText(_translate("MainWindow", "Input sequence"))
         self.appendDataButton.setText(_translate("MainWindow", "Append data"))
         self.cleanButton.setText(_translate("MainWindow", "Clean"))
         self.saveToFileButton.setText(_translate("MainWindow", "Save to file"))
         self.fileSavedText.setText(_translate("MainWindow", "Saved!"))
+from TableView import TableView
 
 
 if __name__ == "__main__":

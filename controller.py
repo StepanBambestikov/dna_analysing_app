@@ -1,5 +1,5 @@
 import torch
-
+from Bio import SeqIO
 import predictor_adapter
 from view_enum import *
 import pandas_adapter as pd
@@ -93,7 +93,7 @@ class controller:
             if not input_file_name or not input_file_type:
                 self.error_manager("Invalid data about input file!")
             try:
-                return self.input_file_data.to_numpy()[0:, :], 1e-5, INPUT_INFO.IS_ACTIVITY
+                return self.input_file_data.to_numpy()[0:, :], 1e-5, INPUT_INFO.IS_SALT
             except Exception:
                 self.error_manager("Invalid input file")
         return _get_entered_data(enum_input_data)
