@@ -61,14 +61,6 @@ class Ui_MainWindow(object):
         self.inputFileNameLineEdit.setFont(font)
         self.inputFileNameLineEdit.setObjectName("inputFileNameLineEdit")
         self.inputFileInnerLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.inputFileNameLineEdit)
-        self.fileSaltConditionLabel = QtWidgets.QLabel(self.inputFileInnerFrame)
-        font = QtGui.QFont()
-        font.setPointSize(18)
-        font.setBold(False)
-        font.setWeight(50)
-        self.fileSaltConditionLabel.setFont(font)
-        self.fileSaltConditionLabel.setObjectName("fileSaltConditionLabel")
-        self.inputFileInnerLayout.setWidget(1, QtWidgets.QFormLayout.SpanningRole, self.fileSaltConditionLabel)
         self.browseButton = QtWidgets.QPushButton(self.inputFileFrame)
         self.browseButton.setGeometry(QtCore.QRect(300, 10, 181, 41))
         font = QtGui.QFont()
@@ -130,7 +122,7 @@ class Ui_MainWindow(object):
         self.writeDataFrame.setGeometry(QtCore.QRect(10, 99, 506, 301))
         self.writeDataFrame.setObjectName("writeDataFrame")
         self.writeDataInnerFrame = QtWidgets.QFrame(self.writeDataFrame)
-        self.writeDataInnerFrame.setGeometry(QtCore.QRect(11, 98, 484, 151))
+        self.writeDataInnerFrame.setGeometry(QtCore.QRect(11, 98, 484, 201))
         self.writeDataInnerFrame.setMinimumSize(QtCore.QSize(484, 0))
         self.writeDataInnerFrame.setObjectName("writeDataInnerFrame")
         self.writeDataInnerLayout = QtWidgets.QFormLayout(self.writeDataInnerFrame)
@@ -225,7 +217,6 @@ class Ui_MainWindow(object):
         self.processingTypeComboBox.setItemText(1, _translate("MainWindow", "conv_abs_processing"))
         self.processingTypeComboBox.setItemText(2, _translate("MainWindow", "conv_rel_processing"))
         self.inputFileNameLabel.setText(_translate("MainWindow", "File name"))
-        self.fileSaltConditionLabel.setText(_translate("MainWindow", "Condition type: Activity"))
         self.browseButton.setText(_translate("MainWindow", "Browse"))
         self.getDataFromInputLabel.setText(_translate("MainWindow", "Get data from input file"))
         self.saveFileNameLabel.setText(_translate("MainWindow", "File name"))
@@ -243,13 +234,3 @@ class Ui_MainWindow(object):
         self.saveToFileButton.setText(_translate("MainWindow", "Save to file"))
         self.fileSavedText.setText(_translate("MainWindow", "Saved!"))
 from TableView import TableView
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())

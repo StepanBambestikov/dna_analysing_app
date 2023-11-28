@@ -18,7 +18,7 @@ class file_output_stream(output_stream):
     def __lshift__(self, saving_dataframe):
         try:
             writer = pd.pandas_writers[self.save_file_type]
-            writer(saving_dataframe, self.save_file_name, header=False)
+            writer(saving_dataframe, self.save_file_name)
         except Exception:
             self.error_manager("Problems with saving data into save file, please check save file validity")
 

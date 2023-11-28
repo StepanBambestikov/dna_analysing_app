@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1381</width>
+    <width>1357</width>
     <height>901</height>
    </rect>
   </property>
@@ -17,9 +17,9 @@
    <widget class="TableView" name="tableView">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>530</x>
       <y>30</y>
-      <width>751</width>
+      <width>741</width>
       <height>731</height>
      </rect>
     </property>
@@ -153,7 +153,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Get data from input file</string>
+      <string>Get data from file</string>
      </property>
     </widget>
    </widget>
@@ -364,7 +364,7 @@
       <rect>
        <x>10</x>
        <y>40</y>
-       <width>201</width>
+       <width>271</width>
        <height>35</height>
       </rect>
      </property>
@@ -417,7 +417,7 @@
    <widget class="QPushButton" name="saveToFileButton">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>530</x>
       <y>770</y>
       <width>191</width>
       <height>61</height>
@@ -435,7 +435,7 @@
    <widget class="QLabel" name="fileSavedText">
     <property name="geometry">
      <rect>
-      <x>732</x>
+      <x>740</x>
       <y>780</y>
       <width>91</width>
       <height>35</height>
@@ -469,8 +469,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1381</width>
-     <height>21</height>
+     <width>1357</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

@@ -7,7 +7,7 @@ import numpy as np
 
 def make_csv_reader():
     def csv_reader(input_file_name):
-        return pd.read_csv(input_file_name, header=None, sep=";")
+        return pd.read_csv(input_file_name, header=0, sep=",")
     return csv_reader
 
 
@@ -22,7 +22,7 @@ def make_fasta_reader():
         sequences = []
         for record in SeqIO.parse(input_file_name, "fasta"):
             sequences.append(str(record.seq))
-        df = pd.DataFrame(sequences, columns=['Sequences'])
+        df = pd.DataFrame(sequences, columns=['Sequence'])
         return df
     return fasta_reader
 
@@ -35,13 +35,13 @@ pandas_readers = {
 
 def make_csv_writer():
     def csv_writer(saving_dataframe, input_file_name):
-        return pd.DataFrame.to_csv(saving_dataframe, input_file_name, sep=",")
+        return pd.DataFrame.to_csv(saving_dataframe, input_file_name, sep=",", header=None, index=False)
     return csv_writer
 
 
 def make_excel_writer():
     def excel_writer(saving_dataframe, input_file_name):
-        return pd.DataFrame.to_excel(saving_dataframe, input_file_name, engine='openpyxl')
+        return pd.DataFrame.to_excel(saving_dataframe, input_file_name, engine='openpyxl', header=None, index=False)
     return excel_writer
 
 pandas_writers = {

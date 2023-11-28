@@ -109,8 +109,6 @@ class view_window(QMainWindow, Ui_MainWindow):
         #todo change buttons in right order!
         salt_value = float(self.ui.NaLineEdit.text())
         Ct = float(self.ui.CtLineEdit.text())
-        # is_activity = self.ui.IsActivityRadioButton.isChecked()
-        # is_salt = self.ui.IsSaltRadioButton.isChecked()
         if not dna or not salt_value:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "Entered data isn't complete. Some of the fields (dna, salt_value) are empty")
@@ -168,18 +166,20 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Invalid input file type, you can use only excel and csv files!")
         read_function = pd.pandas_readers[file_ext]
         data = read_function(file_name)
-        if data.shape[1] == 0:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "Invalid input file, there is no columns")
+        data = data.drop(columns=[col for col in data.columns if col not in ['Sequence', "[Na+] (M)", "Ct (M)"]])
 
-        if "Na" not in data and "[Na⁺]" not in data:
+        if "Sequence" not in data:
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
+                "Invalid input file, there is no Sequence column!")
+
+        if "[Na+] (M)" not in data:
             default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
-                                                                       "There is no Na in file or in default text item!")
+                                                                       "There is no Na in file and in default text item!")
             data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
 
-        if "Ct" not in data:
+        if "Ct (M)" not in data:
             default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
-                                                                       "There is no Ct in file or in default text item!")
+                                                                       "There is no Ct in file and in default text item!")
             data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
 
         output_streams = self.controller._make_output_streams()
