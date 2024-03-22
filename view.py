@@ -166,21 +166,14 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Invalid input file type, you can use only excel and csv files!")
         read_function = pd.pandas_readers[file_ext]
         data = read_function(file_name)
-        data = data.drop(columns=[col for col in data.columns if col not in ['Sequence', "[Na+] (M)", "Ct (M)"]])
+        try_with_names_data = data.drop(columns=[col for col in data.columns if col not in ['Sequence', "[Na+] (M)", "Ct (M)"]])
 
-        if "Sequence" not in data:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "Invalid input file, there is no Sequence column!")
-
-        if "[Na+] (M)" not in data:
-            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
-                                                                       "There is no Na in file and in default text item!")
-            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
-
-        if "Ct (M)" not in data:
-            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
-                                                                       "There is no Ct in file and in default text item!")
-            data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
+        if "Sequence" not in try_with_names_data:
+            data = self.try_without_names(data)
+        else:
+            data = self.prepare_data_with_names(try_with_names_data)
+            # self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
+            #     "Invalid input file, there is no Sequence column!")
 
         output_streams = self.controller._make_output_streams()
         output_streams[0] << data
@@ -207,18 +200,6 @@ class view_window(QMainWindow, Ui_MainWindow):
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
                 "It is needed to choose folder, not file!")
         self.ui.saveDirectoryLineEdit.setText(folder_path)
-
-    # def save_data_to_file(self):
-    #     if self.controller.predictions is None:
-    #         self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Nothing to save to file yet!")
-    #     save_file_name, save_file_type = self._get_save_file()
-    #     predictions = pd._make_output_DataFrame(self.controller.predictions, self.controller.input_data,
-    #                                             output_table_columns.output_column_str_name_list)
-    #     output_stream = output_stream_classes.file_output_stream(save_file_name=save_file_name,
-    #                                                              save_file_type=save_file_type,
-    #                                                              error_manager=self.controller.error_manager)
-    #
-    #     output_stream << predictions
 
     def save_data_browser(self):
         if self.controller.predictions is None:
@@ -248,3 +229,36 @@ class view_window(QMainWindow, Ui_MainWindow):
         self.ui.fileSavedText.show()
         timer = QTimer()
         timer.singleShot(1000, lambda: self.ui.fileSavedText.hide())
+
+    def prepare_data_with_names(self, data):
+
+        if "[Na+] (M)" not in data:
+            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
+                                                                       "There is no Na in file and in default text item!")
+            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
+
+        if "Ct (M)" not in data:
+            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
+                                                                       "There is no Ct in file and in default text item!")
+            data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
+
+        return data
+
+    def try_without_names(self, data):
+        if len(data.columns) == 3:
+            data.columns =['Sequence', "[Na+] (M)", "Ct (M)"] +[f'Column_{i}' for i in range(3, len(data.columns))]
+        elif len(data.columns) == 2:
+            data.columns = ['Sequence', "[Na+] (M)"] + [f'Column_{i}' for i in range(2, len(data.columns))]
+        elif len(data.columns) == 1:
+            data.columns = ['Sequence'] + [f'Column_{i}' for i in range(1, len(data.columns))]
+        # data.columns = ['Sequence', "[Na+] (M)", "Ct (M)"] + [f'Column_{i}' for i in range(3, len(data.columns))]
+        if "[Na+] (M)" not in data:
+            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
+                                                                       "There is no Na in file and in default text item!")
+            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
+
+        if "Ct (M)" not in data:
+            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
+                                                                       "There is no Ct in file and in default text item!")
+            data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
+        return data
