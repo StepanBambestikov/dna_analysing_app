@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1662</width>
-    <height>943</height>
+    <height>926</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,13 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="1" rowspan="5" colspan="3">
+     <widget class="TableView" name="tableView">
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+     </widget>
+    </item>
     <item row="3" column="0">
      <widget class="QPushButton" name="calculateButton">
       <property name="minimumSize">
@@ -33,75 +40,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QFrame" name="processingTypeFrame">
-      <property name="minimumSize">
-       <size>
-        <width>506</width>
-        <height>71</height>
-       </size>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="processingTypeLabel">
-         <property name="font">
-          <font>
-           <pointsize>18</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Model</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="processingTypeComboBox">
-         <property name="font">
-          <font>
-           <pointsize>18</pointsize>
-          </font>
-         </property>
-         <item>
-          <property name="text">
-           <string>conv_abs_processing</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QPushButton" name="saveToFileButton">
-      <property name="font">
-       <font>
-        <pointsize>18</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Save to file</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="5" colspan="3">
-     <widget class="TableView" name="tableView">
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QLabel" name="fileSavedText">
-      <property name="font">
-       <font>
-        <pointsize>18</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Saved!</string>
-      </property>
-     </widget>
-    </item>
     <item row="5" column="3">
      <widget class="QPushButton" name="cleanButton">
       <property name="font">
@@ -112,100 +50,6 @@
       <property name="text">
        <string>Clean</string>
       </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QFrame" name="inputFileFrame">
-      <property name="minimumSize">
-       <size>
-        <width>506</width>
-        <height>161</height>
-       </size>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is an tip!!!!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <widget class="QFrame" name="inputFileInnerFrame">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>70</y>
-         <width>484</width>
-         <height>113</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>484</width>
-         <height>113</height>
-        </size>
-       </property>
-       <layout class="QFormLayout" name="inputFileInnerLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="inputFileNameLabel">
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>File name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="inputFileNameLineEdit">
-          <property name="font">
-           <font>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QPushButton" name="browseButton">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>10</y>
-         <width>181</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>18</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="getDataFromInputLabel">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>281</width>
-         <height>35</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>281</width>
-         <height>35</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>18</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Get data from file</string>
-       </property>
-      </widget>
      </widget>
     </item>
     <item row="1" column="0">
@@ -341,7 +185,163 @@
       </widget>
      </widget>
     </item>
-    <item row="4" column="0" rowspan="2">
+    <item row="2" column="0">
+     <widget class="QFrame" name="inputFileFrame">
+      <property name="minimumSize">
+       <size>
+        <width>506</width>
+        <height>161</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is an tip!!!!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <widget class="QFrame" name="inputFileInnerFrame">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>70</y>
+         <width>484</width>
+         <height>113</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>484</width>
+         <height>113</height>
+        </size>
+       </property>
+       <layout class="QFormLayout" name="inputFileInnerLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="inputFileNameLabel">
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>File name</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="inputFileNameLineEdit">
+          <property name="font">
+           <font>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QPushButton" name="browseButton">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>10</y>
+         <width>181</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="getDataFromInputLabel">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>281</width>
+         <height>35</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>281</width>
+         <height>35</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>18</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Get data from file</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QFrame" name="processingTypeFrame">
+      <property name="minimumSize">
+       <size>
+        <width>506</width>
+        <height>71</height>
+       </size>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="processingTypeLabel">
+         <property name="font">
+          <font>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Model</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="processingTypeComboBox">
+         <property name="font">
+          <font>
+           <pointsize>18</pointsize>
+          </font>
+         </property>
+         <item>
+          <property name="text">
+           <string>conv_abs_processing</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="5" column="2">
+     <widget class="QLabel" name="fileSavedText">
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Saved!</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QPushButton" name="saveToFileButton">
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Save to file</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
      <widget class="QFrame" name="saveFileFrame">
       <property name="minimumSize">
        <size>
