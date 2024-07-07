@@ -67,13 +67,13 @@ class linear_net_06_05(nn.Module):
         self.Ne_net = Ne_conv_net(12 + 8)
 
     def forward(self, input):
-        nearest_neibours, Na_data = input
+        nearest_neighbours, Na_data = input
         #Na args preparation
-        Na_coeffitient = self.Ne_net(nearest_neibours, Na_data) # todo исправить потом
+        Na_coeffitient = self.Ne_net(nearest_neighbours, Na_data)
         dS_activity_additive = Na_coeffitient[:, 0] * torch.log(Na_data[:, Activity_column]) * Na_factor
         dG_activity_additive = Na_coeffitient[:, 1] * torch.log(Na_data[:, Activity_column]) * Na_factor
         #Main nn preparation
-        result = self.origin_net(nearest_neibours)
+        result = self.origin_net(nearest_neighbours)
         result[:, 2] += dS_activity_additive
         result[:, 1] += dG_activity_additive
         return result

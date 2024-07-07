@@ -1,5 +1,4 @@
-import pandas_adapter as pd
-import abc
+from project.predictor import pandas_adapter as pd
 from abc import ABC, abstractmethod
 
 
@@ -10,17 +9,18 @@ class output_stream(ABC):
 
 
 class file_output_stream(output_stream):
-    def __init__(self, save_file_name, save_file_type, error_manager=None):
+    def __init__(self, save_file_name, save_file_type, yaml_data, error_manager=None):
         self.save_file_name = save_file_name
         self.save_file_type = save_file_type
         self.error_manager = error_manager
+        self.yaml_data = yaml_data
 
     def __lshift__(self, saving_dataframe):
         try:
             writer = pd.pandas_writers[self.save_file_type]
             writer(saving_dataframe, self.save_file_name)
         except Exception:
-            self.error_manager("Problems with saving data into save file, please check save file validity")
+            self.error_manager(self.yaml_data["errors"]["saving_data_into_save_file_error"])
 
 
 class function_output_stream(output_stream):

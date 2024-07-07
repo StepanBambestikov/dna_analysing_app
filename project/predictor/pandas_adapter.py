@@ -1,19 +1,23 @@
 import pandas
 import pandas as pd
 from Bio import SeqIO
-from file_types import File_types
+
+from project.service.file_ext import pandas_file_extensions
+from project.service.file_types import File_types
 import numpy as np
 
 
 def make_csv_reader():
     def csv_reader(input_file_name):
         return pd.read_csv(input_file_name, header=0, sep=",")
+
     return csv_reader
 
 
 def make_excel_reader():
     def excel_reader(input_file_name):
         return pd.read_excel(input_file_name, engine='openpyxl')
+
     return excel_reader
 
 
@@ -24,6 +28,7 @@ def make_fasta_reader():
             sequences.append(str(record.seq))
         df = pd.DataFrame(sequences, columns=['Sequence'])
         return df
+
     return fasta_reader
 
 
@@ -33,30 +38,26 @@ pandas_readers = {
     File_types.FASTA: make_fasta_reader()
 }
 
+
 def make_csv_writer():
     def csv_writer(saving_dataframe, input_file_name):
         return pd.DataFrame.to_csv(saving_dataframe, input_file_name, sep=",", header=None, index=False)
+
     return csv_writer
 
 
 def make_excel_writer():
     def excel_writer(saving_dataframe, input_file_name):
         return pd.DataFrame.to_excel(saving_dataframe, input_file_name, engine='openpyxl', header=None, index=False)
+
     return excel_writer
+
 
 pandas_writers = {
     File_types.CSV: make_csv_writer(),
     File_types.TXT: make_csv_writer(),
     File_types.DAT: make_csv_writer(),
     File_types.EXCEL: make_excel_writer(),
-}
-
-pandas_file_extensions = {
-    "csv": File_types.CSV,
-    "dat": File_types.DAT,
-    "txt": File_types.TXT,
-    "xlsx": File_types.EXCEL,
-    "fa": File_types.FASTA,
 }
 
 
@@ -70,8 +71,8 @@ def get_file_extension_by_name(file_name):
 
 
 def _make_output_DataFrame(predictions_tensor, input_data_numpy, column_names, column_options, decimals):
-    output_data = np.concatenate((input_data_numpy, np.round(predictions_tensor.detach().numpy(), decimals=decimals)), axis=1)
+    output_data = np.concatenate((input_data_numpy, np.round(predictions_tensor.detach().numpy(), decimals=decimals)),
+                                 axis=1)
     output_data = np.concatenate((np.array(column_names), np.array(column_options), output_data), axis=0)
-    # output_dataFrame = pandas.DataFrame(data=output_data, columns=column_names)
     output_dataFrame = pandas.DataFrame(data=output_data)
     return output_dataFrame

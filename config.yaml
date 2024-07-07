@@ -1,0 +1,56 @@
+tool_tips:
+  input_file_tip: '<html><head/><body><p>The selected file is used to get the input data. Columns are numbered this way and that way, missing columns will be replaced with default parameters</p></body></html>'
+  save_file_tip: '<html><head/><body><p>Supported formats are excel, csv and txt</p></body></html>'
+
+main_window:
+  program_name: 'dna analysing'
+
+input_data_labels:
+  sequence: 'Sequence'
+  Na_m: '[Na+] (M)'
+  Ct_m: 'Ct (M)'
+
+output_column_names:
+  DNA: 'Sequence'
+  Ct: 'Ct'
+  Na: '[Na⁺]'
+  dH: 'ΔH⁰'
+  dG: 'ΔG⁰₃₇'
+  dS: 'ΔS⁰'
+  Tm: 'Tₘ'
+
+default_values:
+  Ct_default: '1e-5'
+
+model_names_to_saved_files:
+  conv_rel: '../networks/conv2d_net_06_05normalized_l1_multi_loss_relative_Tm'
+  conv_abs: '../networks/conv2d_net_06_05normalized_l1_multi_loss_absolute_Tm'
+  linear_rel: '../networks/linear_net_06_05normalized_l1_multi_loss_06_05_relative_loss'
+
+output_column_str_options_list:
+  DNA: "5'-3'"
+  Ct: 'M'
+  Na: 'M'
+  dH: 'cal/mol'
+  dG: 'cal/mol'
+  dS: 'cal/mol/K'
+  Tm: 'C⁰'
+
+errors:
+  error_title: 'Error!'
+  no_input_file_error: 'There is no input file name'
+  no_save_file_error: 'There is no save file name'
+  invalid_input_data_error: 'Entered data isnt complete. Some of the fields (dna, salt_value) are empty'
+  invalid_written_data_error: 'Invalid written data'
+  no_input_types_error: 'Neither of input types are chosen. Select input file or enter the data by yourself'
+  invalid_input_file_type_error: 'Invalid input file type, you can use only excel and csv files!'
+  folder_not_choosen_error: 'It is needed to choose folder, not file!'
+  nothing_to_save_error: 'Nothing to save to file yet!'
+  invalid_save_file_error: 'Invalid save file extention!'
+  no_save_directory_error: 'no save directory!'
+  no_Na_in_file: 'There is no Na in file and in default text item!'
+  no_Ct_in_file: 'There is no Ct in file and in default text item!'
+  invalid_data_for_analysis: 'There is invalid data for analysis. Please, check all the data validity'
+  invalid_data_in_input_file: 'Invalid data about input file!'
+  unexpected_letter_in_dha_sequence: 'Unexpected letter in dna sequence'
+  saving_data_into_save_file_error: 'Problems with saving data into save file, please check save file validity'

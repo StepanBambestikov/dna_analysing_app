@@ -1,15 +1,16 @@
+import yaml
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QAbstractScrollArea
 from widgets import Ui_MainWindow
-import view_enum as ve
-from predictor_types import Predictor_types
-from file_types import File_types
+from project.service import view_enum as ve, output_table_columns
+from project.service.base import Predictor_types, DataColumns
+from project.service.file_types import File_types
 import controller
-import pandasModel
-import output_table_columns
+from project.table_service import pandasModel
 import output_stream_classes
-import pandas_adapter as pd
+from project.predictor import pandas_adapter as pd
 from PyQt5.QtCore import QTimer
-from output_table_columns import DataColumns, output_column_names
+from project.service.output_table_columns import output_column_names
+from PyQt5 import QtCore
 
 predictor_text_to_enum = {
     "linear_rel_processing": Predictor_types.LINEAR_REL_PREDICTOR,
@@ -31,6 +32,13 @@ class ManagerException(Exception):
     pass
 
 
+def exec_function_with_error_check(function):
+    try:
+        function()
+    except ManagerException:
+        return
+
+
 class view_window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -45,22 +53,47 @@ class view_window(QMainWindow, Ui_MainWindow):
 
         self.managers = {ve.VIEW_MANAGERS.OUTPUT_FUNCTION: self._output_dataFrame,
                          ve.VIEW_MANAGERS.ERROR_MANAGER: self._show_error_message}
-        self.controller = controller.controller(self.managers)
+        with open('../config.yaml', 'r', encoding='utf-8') as file:
+            data = yaml.safe_load(file)
+        self.controller = controller.controller(self.managers, data)
         self.save_directory = None
 
+        self.yaml_data = data
+        self.set_tool_tips()
+        self.setWindowTitle(
+            QtCore.QCoreApplication.translate("MainWindow", self.yaml_data["main_window"]["program_name"]))
+
+    def set_tool_tips(self):
+        """
+        The function loads all the tips to the widget applications. The hints are taken from the yaml file
+        """
+        _translate = QtCore.QCoreApplication.translate
+        self.ui.inputFileFrame.setToolTip(
+            _translate("MainWindow", self.yaml_data["tool_tips"]["input_file_tip"]))
+        self.ui.saveToFileButton.setToolTip(
+            _translate("MainWindow", self.yaml_data["tool_tips"]["save_file_tip"]))
+
     def _show_error_message(self, informative_text):
+        """
+        The function presents any program error as a pop-up error window
+        """
         self.error_message.setInformativeText(informative_text)
-        self.error_message.setWindowTitle("Error!")
+        self.error_message.setWindowTitle(self.yaml_data["errors"]["error_title"])
         self.error_message.exec_()
         raise ManagerException
 
     def _output_dataFrame(self, dataFrame):
+        """
+        The function connects the output data table to the visible widget
+        """
         view_table_model = pandasModel.pandasModel(dataFrame)
         self.ui.tableView.setModel(view_table_model)
-        self.ui.tableView.resizeColumnsToContents()
         self.ui.tableView.show()
 
     def _connectSignalsSlots(self):
+        """
+        The function connects actions to the visible buttons of the application
+        """
         self.ui.saveFileInnerFrame.hide()
         self.ui.appendDataButton.hide()
         self.ui.saveFileFrame.hide()
@@ -68,15 +101,12 @@ class view_window(QMainWindow, Ui_MainWindow):
         self.ui.fileSavedText.hide()
         self.ui.tableView.setSizeAdjustPolicy(
             QAbstractScrollArea.AdjustToContents)
-        # self.ui.saveFileCheckBox.clicked.connect(lambda: self._hide_unhide_function(self.ui.saveFileInnerFrame))
-        # self.ui.writeDataCheckBox.clicked.connect(lambda: self._hide_unhide_function(self.ui.writeDataInnerFrame))
-        # self.ui.inputFileCheckBox.clicked.connect(lambda: self._hide_unhide_function(self.ui.inputFileInnerFrame))
-        self.ui.calculateButton.clicked.connect(lambda: self.exec_function_with_error_check(self._collect_information))
+        self.ui.calculateButton.clicked.connect(lambda: exec_function_with_error_check(self._collect_information))
         self.ui.cleanButton.clicked.connect(lambda: self.clean_data_view())
         self.ui.appendDataButton.clicked.connect(lambda: self.append_data_query())
-        self.ui.browseButton.clicked.connect(lambda: self.exec_function_with_error_check(self.browse_input_file))
-        self.ui.saveToFileButton.clicked.connect(lambda: self.exec_function_with_error_check(self.save_data_browser))
-        self.ui.browesSaveButton.clicked.connect(lambda: self.exec_function_with_error_check(self.browse_save_file))
+        self.ui.browseButton.clicked.connect(lambda: exec_function_with_error_check(self.browse_input_file))
+        self.ui.saveToFileButton.clicked.connect(lambda: exec_function_with_error_check(self.save_data_browser))
+        self.ui.browesSaveButton.clicked.connect(lambda: exec_function_with_error_check(self.browse_save_file))
 
     def _hide_unhide_function(self, widget):
         if not self.visibility_current_states[widget]:
@@ -94,34 +124,42 @@ class view_window(QMainWindow, Ui_MainWindow):
         input_file_name = self.ui.inputFileNameLineEdit.text()
         input_file_type = pd.get_file_extension_by_name(input_file_name)
         if not input_file_name or not input_file_type:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("There is no input file name")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["no_input_file_error"])
         return input_file_name, input_file_type
 
     def _get_save_file(self):
+        """
+        The function tries to read the file for saving and validates its extension
+        """
         save_file_name = self.ui.saveFileNameLineEdit.text()
         save_file_type = pd.get_file_extension_by_name(save_file_name)
         if not save_file_name:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("There is no save file name")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["no_save_file_error"])
         return save_file_name, save_file_type
 
-    def _get_writed_data(self):
+    def _get_writted_data(self):
+        """
+        The function tries to read the input data only from the values entered by the user
+        """
         dna = self.ui.dnaSequenceLineEdit.text()
-        #todo change buttons in right order!
         salt_value = float(self.ui.NaLineEdit.text())
         Ct = float(self.ui.CtLineEdit.text())
         if not dna or not salt_value:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "Entered data isn't complete. Some of the fields (dna, salt_value) are empty")
+                self.yaml_data["errors"]["invalid_input_data_error"])
         return dna, salt_value, Ct
 
     def _collect_information(self):
+        """
+        The function prepares all input data and gives it to the main controller unit
+        """
         user_information = {ve.INPUT_INFO.PREDICTOR_TYPE: self._get_predictor_type()}
         if not self.ui.writeDataInnerFrame.isHidden():
             try:
-                dna, salt_value, Ct = self._get_writed_data()
+                dna, salt_value, Ct = self._get_writted_data()
             except Exception:
                 self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                    "Invalid written data")
+                    self.yaml_data["errors"]["invalid_written_data_error"])
             user_information[ve.INPUT_INFO.DNA_DATA] = dna
             user_information[ve.INPUT_INFO.Ct] = Ct
             user_information[ve.INPUT_INFO.SALT_VALUE] = salt_value
@@ -133,20 +171,14 @@ class view_window(QMainWindow, Ui_MainWindow):
             user_information[ve.INPUT_INFO.INPUT_FILE_TYPE] = input_file_type
         else:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "Neither of input types are chosen. Select input file or enter the data by yourself")
+                self.yaml_data["errors"]["no_input_types_error"])
 
         self.controller.parse_info_and_calculate_parameters(user_information)
-        # if not self.ui.inputFileInnerFrame.isHidden():
-        #     self.ui.inputFileInnerFrame.hide()
-        #     self.ui.appendDataButton.show()
-
-    def exec_function_with_error_check(self, function):
-        try:
-            function()
-        except ManagerException:
-            return
 
     def clean_data_view(self):
+        """
+        The function clears the output table in the application if there are any
+        """
         self.controller.input_data = None
         self.controller.predictions = None
         self.ui.tableView.setModel(None)
@@ -157,23 +189,28 @@ class view_window(QMainWindow, Ui_MainWindow):
         self.ui.appendDataButton.hide()
 
     def browse_input_file(self):
+        """
+        The function tries to read data from a file entered by the user
+        """
+        Secuence_label, Na_label, Ct_label = self.yaml_data["input_data_labels"]["sequence"], \
+            self.yaml_data["input_data_labels"]["Na_m"], \
+            self.yaml_data["input_data_labels"]["Ct_m"]
         fname = QFileDialog.getOpenFileName(self, 'Open file')
         file_name = fname[0]
         if len(file_name) == 0:
             return
         file_ext = pd.get_file_extension_by_name(file_name)
         if file_ext is None:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Invalid input file type, you can use only excel and csv files!")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["invalid_input_file_type_error"])
         read_function = pd.pandas_readers[file_ext]
         data = read_function(file_name)
-        try_with_names_data = data.drop(columns=[col for col in data.columns if col not in ['Sequence', "[Na+] (M)", "Ct (M)"]])
+        try_with_names_data = data.drop(
+            columns=[col for col in data.columns if col not in [Secuence_label, Na_label, Ct_label]])
 
-        if "Sequence" not in try_with_names_data:
+        if Secuence_label not in try_with_names_data:
             data = self.try_without_names(data)
         else:
             data = self.prepare_data_with_names(try_with_names_data)
-            # self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-            #     "Invalid input file, there is no Sequence column!")
 
         output_streams = self.controller._make_output_streams()
         output_streams[0] << data
@@ -194,16 +231,22 @@ class view_window(QMainWindow, Ui_MainWindow):
         return valid_parameter
 
     def browse_save_file(self):
+        """
+        The function allows you to select the path to the file in the browser and draws it in the application
+        """
         folder_path = QFileDialog.getExistingDirectory(self, 'Select Folder')
-        splitted_name = folder_path.partition(".")
-        if len(splitted_name) > 3:
+        split_name = folder_path.partition(".")
+        if len(split_name) > 3:
             self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](
-                "It is needed to choose folder, not file!")
+                self.yaml_data["errors"]["folder_not_choosen_error"])
         self.ui.saveDirectoryLineEdit.setText(folder_path)
 
     def save_data_browser(self):
+        """
+        The function saves the output data to a file
+        """
         if self.controller.predictions is None:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("Nothing to save to file yet!")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["nothing_to_save_error"])
         if self.ui.saveFileInnerFrame.isHidden():
             self.ui.saveFileFrame.show()
             self.ui.saveFileInnerFrame.show()
@@ -211,13 +254,14 @@ class view_window(QMainWindow, Ui_MainWindow):
         save_file_name = self.ui.saveFileNameLineEdit.text()
         save_file_type = pd.get_file_extension_by_name(save_file_name)
         if save_file_type is None:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("invalid save file extention!")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["invalid_save_file_error"])
         save_directory = self.ui.saveDirectoryLineEdit.text()
         if len(save_directory) == 0:
-            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER]("no save directory!")
+            self.managers[ve.VIEW_MANAGERS.ERROR_MANAGER](self.yaml_data["errors"]["no_save_directory_error"])
         save_file_name = save_directory + "/" + save_file_name
         predictions = pd._make_output_DataFrame(self.controller.predictions, self.controller.input_data,
-                                                output_table_columns.output_column_str_name_list, decimals=5, column_options=output_table_columns.output_column_str_options_list)
+                                                output_table_columns.output_column_str_name_list, decimals=5,
+                                                column_options=output_table_columns.output_column_str_options_list)
         output_stream = output_stream_classes.file_output_stream(save_file_name=save_file_name,
                                                                  save_file_type=save_file_type,
                                                                  error_manager=self.controller.error_manager)
@@ -230,35 +274,32 @@ class view_window(QMainWindow, Ui_MainWindow):
         timer = QTimer()
         timer.singleShot(1000, lambda: self.ui.fileSavedText.hide())
 
-    def prepare_data_with_names(self, data):
-
-        if "[Na+] (M)" not in data:
+    def calculateNaAndCt(self, data, Na_label, Ct_label):
+        if Na_label not in data:
             default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
-                                                                       "There is no Na in file and in default text item!")
+                                                                       self.yaml_data["errors"]["no_Na_in_file"])
             data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
 
-        if "Ct (M)" not in data:
+        if Ct_label not in data:
             default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
-                                                                       "There is no Ct in file and in default text item!")
+                                                                       self.yaml_data["errors"]["no_Ct_in_file"])
             data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
+        return
 
+    def prepare_data_with_names(self, data):
+        Na_label, Ct_label = self.yaml_data["input_data_labels"]["Na_m"], self.yaml_data["input_data_labels"]["Ct_m"]
+        self.calculateNaAndCt(data, Na_label, Ct_label)
         return data
 
     def try_without_names(self, data):
+        Sequence_label, Na_label, Ct_label = self.yaml_data["input_data_labels"]["sequence"], \
+            self.yaml_data["input_data_labels"]["Na_m"], \
+            self.yaml_data["input_data_labels"]["Ct_m"]
         if len(data.columns) == 3:
-            data.columns =['Sequence', "[Na+] (M)", "Ct (M)"] +[f'Column_{i}' for i in range(3, len(data.columns))]
+            data.columns = [Sequence_label, Na_label, Ct_label] + [f'Column_{i}' for i in range(3, len(data.columns))]
         elif len(data.columns) == 2:
-            data.columns = ['Sequence', "[Na+] (M)"] + [f'Column_{i}' for i in range(2, len(data.columns))]
+            data.columns = [Sequence_label, Na_label] + [f'Column_{i}' for i in range(2, len(data.columns))]
         elif len(data.columns) == 1:
-            data.columns = ['Sequence'] + [f'Column_{i}' for i in range(1, len(data.columns))]
-        # data.columns = ['Sequence', "[Na+] (M)", "Ct (M)"] + [f'Column_{i}' for i in range(3, len(data.columns))]
-        if "[Na+] (M)" not in data:
-            default_Na = self.get_valid_float_parameter_from_line_edit(self.ui.NaLineEdit,
-                                                                       "There is no Na in file and in default text item!")
-            data.insert(1, output_column_names[DataColumns.Na], [default_Na for _ in range(data.shape[0])])
-
-        if "Ct (M)" not in data:
-            default_Ct = self.get_valid_float_parameter_from_line_edit(self.ui.CtLineEdit,
-                                                                       "There is no Ct in file and in default text item!")
-            data.insert(2, output_column_names[DataColumns.Ct], [default_Ct for _ in range(data.shape[0])])
+            data.columns = [Sequence_label] + [f'Column_{i}' for i in range(1, len(data.columns))]
+        self.calculateNaAndCt(data, Na_label, Ct_label)
         return data

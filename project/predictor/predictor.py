@@ -1,11 +1,10 @@
-from enum import IntEnum
 import torch
 import math
-import dna_handlers
-import network_classes as nn_classes
-import view_enum
+from project.network_service import dna_handlers
+from project.service import view_enum, output_table_columns
+from project.service.base import Processing, prediction_columns
 
-DEFAULT_Ct = 1e-5
+DEFAULT_Ct = float(output_table_columns.data['default_values']['Ct_default'])
 
 
 def _Tm_calculation(dH_values, dS_values, is_celsius=True, Ct=DEFAULT_Ct):
@@ -18,37 +17,28 @@ def _Tm_calculation(dH_values, dS_values, is_celsius=True, Ct=DEFAULT_Ct):
     return Tm_values
 
 
-class Processing(IntEnum):
-    NN = 0
-    D1 = 1
-    D2 = 2
-
-
-class prediction_columns(IntEnum):
-    dH_INDEX = 0
-    dG_INDEX = 1
-    dS_INDEX = 2
-    Tm_INDEX = 3
-
-
 dna_handlers = {
     Processing.D1: dna_handlers.make_1d_data_from_text_dna,
     Processing.D2: {view_enum.INPUT_INFO.IS_ACTIVITY: dna_handlers.Na_data_function_maker(
-        dna_handlers.make_2d_data_from_text_dna, prepare_salt=False),
-                    view_enum.INPUT_INFO.IS_SALT: dna_handlers.Na_data_function_maker(
-                        dna_handlers.make_2d_data_from_text_dna,
-                        prepare_salt=True)},
+        dna_handlers.make_2d_data_from_text_dna, output_table_columns.data, prepare_salt=False),
+        view_enum.INPUT_INFO.IS_SALT: dna_handlers.Na_data_function_maker(
+            dna_handlers.make_2d_data_from_text_dna,
+            output_table_columns.data,
+            prepare_salt=True)},
     Processing.NN: {view_enum.INPUT_INFO.IS_ACTIVITY: dna_handlers.Na_data_function_maker(
-        dna_handlers.make_nn_data_from_text_dna, prepare_salt=False),
-                    view_enum.INPUT_INFO.IS_SALT: dna_handlers.Na_data_function_maker(
-                        dna_handlers.make_nn_data_from_text_dna,
-                        prepare_salt=True)}
+        dna_handlers.make_nn_data_from_text_dna,
+        output_table_columns.data,
+        prepare_salt=False),
+        view_enum.INPUT_INFO.IS_SALT: dna_handlers.Na_data_function_maker(
+            dna_handlers.make_nn_data_from_text_dna,
+            output_table_columns.data,
+            prepare_salt=True)}
 }
 
 model_names_to_saved_files = {
-    "conv_rel": "conv2d_net_06_05normalized_l1_multi_loss_relative_Tm",
-    "conv_abs": "conv2d_net_06_05normalized_l1_multi_loss_absolute_Tm",
-    "linear_rel": "linear_net_06_05normalized_l1_multi_loss_06_05_relative_loss"
+    "conv_rel": output_table_columns.data['model_names_to_saved_files']['conv_rel'],
+    "conv_abs": output_table_columns.data['model_names_to_saved_files']['conv_abs'],
+    "linear_rel": output_table_columns.data['model_names_to_saved_files']['linear_rel']
 }
 
 
@@ -71,4 +61,6 @@ class Predictor:
         predictions = model([*processed_dna])
         Tm_prediction = _Tm_calculation(predictions[:, prediction_columns.dH_INDEX],
                                         predictions[:, prediction_columns.dS_INDEX], Ct=Ct)
+        predictions = predictions[:,
+                      [prediction_columns.dH_INDEX, prediction_columns.dS_INDEX, prediction_columns.dG_INDEX]]
         return torch.cat((predictions, Tm_prediction[:, None]), dim=1)

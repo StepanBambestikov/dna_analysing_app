@@ -1,6 +1,7 @@
-import predictor
-import network_classes as nn_classes
-from predictor_types import Predictor_types
+import project.service.base
+from project.network_service import network_classes as nn_classes
+from project.predictor import predictor
+from project.service.base import Predictor_types
 
 linear_rel_predictor = predictor.Predictor("linear_rel", nn_classes.linear_net_06_05, conv_factor=False)
 
@@ -15,9 +16,9 @@ predictor_to_object = {
 }
 
 predictor_to_dna_analisys_type = {
-    Predictor_types.LINEAR_REL_PREDICTOR: predictor.Processing.NN,
-    Predictor_types.CONV_ABS_PREDICTOR: predictor.Processing.D2,
-    Predictor_types.CONV_REL_PREDICTOR: predictor.Processing.D2
+    Predictor_types.LINEAR_REL_PREDICTOR: project.service.base.Processing.NN,
+    Predictor_types.CONV_ABS_PREDICTOR: project.service.base.Processing.D2,
+    Predictor_types.CONV_REL_PREDICTOR: project.service.base.Processing.D2
 }
 
 
