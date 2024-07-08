@@ -1,4 +1,4 @@
-from project.predictor import pandas_adapter as pd
+from predictor import pandas_adapter as pd
 from abc import ABC, abstractmethod
 
 

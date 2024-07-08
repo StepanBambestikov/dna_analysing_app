@@ -1,4 +1,4 @@
-from project.service.file_types import File_types
+from service.file_types import File_types
 
 pandas_file_extensions = {
     "csv": File_types.CSV,

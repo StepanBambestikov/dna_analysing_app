@@ -2,8 +2,8 @@ import pandas
 import pandas as pd
 from Bio import SeqIO
 
-from project.service.file_ext import pandas_file_extensions
-from project.service.file_types import File_types
+from service.file_ext import pandas_file_extensions
+from service.file_types import File_types
 import numpy as np
 
 

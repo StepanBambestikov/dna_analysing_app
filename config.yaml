@@ -23,9 +23,9 @@ default_values:
   Ct_default: '1e-5'
 
 model_names_to_saved_files:
-  conv_rel: '../networks/conv2d_net_06_05normalized_l1_multi_loss_relative_Tm'
-  conv_abs: '../networks/conv2d_net_06_05normalized_l1_multi_loss_absolute_Tm'
-  linear_rel: '../networks/linear_net_06_05normalized_l1_multi_loss_06_05_relative_loss'
+  conv_rel: 'networks/conv2d_net_06_05normalized_l1_multi_loss_relative_Tm'
+  conv_abs: 'networks/conv2d_net_06_05normalized_l1_multi_loss_absolute_Tm'
+  linear_rel: 'networks/linear_net_06_05normalized_l1_multi_loss_06_05_relative_loss'
 
 output_column_str_options_list:
   DNA: "5'-3'"

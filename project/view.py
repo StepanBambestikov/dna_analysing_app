@@ -1,15 +1,15 @@
 import yaml
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog, QAbstractScrollArea
 from widgets import Ui_MainWindow
-from project.service import view_enum as ve, output_table_columns
-from project.service.base import Predictor_types, DataColumns
-from project.service.file_types import File_types
+from service import view_enum as ve, output_table_columns
+from service.base import Predictor_types, DataColumns
+from service.file_types import File_types
 import controller
-from project.table_service import pandasModel
+from table_service import pandasModel
 import output_stream_classes
-from project.predictor import pandas_adapter as pd
+from predictor import pandas_adapter as pd
 from PyQt5.QtCore import QTimer
-from project.service.output_table_columns import output_column_names
+from service.output_table_columns import output_column_names
 from PyQt5 import QtCore
 
 predictor_text_to_enum = {
@@ -53,7 +53,7 @@ class view_window(QMainWindow, Ui_MainWindow):
 
         self.managers = {ve.VIEW_MANAGERS.OUTPUT_FUNCTION: self._output_dataFrame,
                          ve.VIEW_MANAGERS.ERROR_MANAGER: self._show_error_message}
-        with open('../config.yaml', 'r', encoding='utf-8') as file:
+        with open('config.yaml', 'r', encoding='utf-8') as file:
             data = yaml.safe_load(file)
         self.controller = controller.controller(self.managers, data)
         self.save_directory = None
@@ -264,7 +264,8 @@ class view_window(QMainWindow, Ui_MainWindow):
                                                 column_options=output_table_columns.output_column_str_options_list)
         output_stream = output_stream_classes.file_output_stream(save_file_name=save_file_name,
                                                                  save_file_type=save_file_type,
-                                                                 error_manager=self.controller.error_manager)
+                                                                 error_manager=self.controller.error_manager,
+								 yaml_data=self.yaml_data)
 
         output_stream << predictions
         self.showSavedInOneSecond()

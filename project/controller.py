@@ -1,10 +1,10 @@
 import torch
 
-from project.predictor import pandas_adapter as pd, predictor_adapter as pa
-from project.predictor.predictor import dna_handlers
-from project.service.view_enum import *
+from predictor import pandas_adapter as pd, predictor_adapter as pa
+from predictor.predictor import dna_handlers
+from service.view_enum import *
 import numpy as np
-from project.service import output_table_columns
+from service import output_table_columns
 import output_stream_classes
 
 

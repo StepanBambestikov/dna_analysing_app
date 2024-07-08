@@ -1,8 +1,8 @@
 import torch
 import math
-from project.network_service import dna_handlers
-from project.service import view_enum, output_table_columns
-from project.service.base import Processing, prediction_columns
+from network_service import dna_handlers
+from service import view_enum, output_table_columns
+from service.base import Processing, prediction_columns
 
 DEFAULT_Ct = float(output_table_columns.data['default_values']['Ct_default'])
 

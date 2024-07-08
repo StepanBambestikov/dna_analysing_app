@@ -1,9 +1,8 @@
-Bio==1.7.1
+Bio==1.6.2
 biopython==1.81
 numpy==1.24.2
 pandas==2.2.2
 PyQt5==5.15.10
 PyQt5_sip==12.13.0
 PyYAML==6.0
-PyYAML==6.0.1
 torch==2.0.0

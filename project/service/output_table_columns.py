@@ -1,8 +1,8 @@
 import yaml
 
-from project.service.base import DataColumns
+from service.base import DataColumns
 
-with open('../config.yaml', 'r', encoding='utf-8') as file:
+with open('config.yaml', 'r', encoding='utf-8') as file:
     data = yaml.safe_load(file)
 
 output_column_names = {

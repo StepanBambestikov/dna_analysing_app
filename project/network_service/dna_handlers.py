@@ -1,8 +1,8 @@
 import numpy as np
 import torch
 
-from project.service.base import dna_bases_count, dna_binary_view, dna_base_dict, gc_pows, length_pows
-from project.service.nn import nearest_neighbors, ends
+from service.base import dna_bases_count, dna_binary_view, dna_base_dict, gc_pows, length_pows
+from service.nn import nearest_neighbors, ends
 
 
 def pair_finder(pairs, text_sequence):
